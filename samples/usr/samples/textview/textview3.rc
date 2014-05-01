@@ -1,0 +1,9 @@
+#define INCL_PM
+#define INCL_NLS
+
+#include <os2.h>
+
+MENU 1000
+{
+  MENUITEM      "Open",                   3001
+}

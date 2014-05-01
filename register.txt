@@ -1,0 +1,122 @@
+===============================================================================
+           Objective C OS/2 PM and database library - REGISTER.TXT
+===============================================================================
+
+After paying the registration fee, fill in the following registration form
+and send it to me to the following address:
+
+	Thomas Baier
+	Ufergasse 68
+	A-3500 Krems
+	AUSTRIA
+
+As it seems to be quite expensive to pay directly to my bank account from
+foreign countries, it is recommended to use Eurocheque, if possible.
+
+After I received this registration form, the registered version of the program
+will be sent to you uuencoded via Internet E-mail.
+
+If this is not possible, please send a disk, a self-addressed envelope and
+return postage. If you are outside Austria, send an international postage
+reply coupon! The registered version will be sent to you via snail mail.
+
+--------------------------------- CUT HERE ---------------------------------
+
+Registration form for OS/2 PM and database libraries
+
+PM class library version is 		0.7
+Database class library version is	0.5
+
+The registration fee for the OS/2 PM class library together with the Database
+library is 400ATS (400 Austrian Schillings), that's about 40US$, per copy
+for individuals or 500ATS for companies.
+
+
+	Pricing for individuals:
+
+		____ copies for 400 ATS each makes a total of _____ ATS.
+
+
+	Pricing for companies:
+
+		____ copies for 500 ATS each makes a total of _____ ATS.
+
+
+	The total sum of _____ ATS has been
+
+
+	o paid to the bank account
+
+					THOMAS BAIER
+		NAME OF BANK: 		RAIFFEISENBANK KREMS
+		ID Nr. OF BANK:		32397
+		ACCOUNT NR.:		12.195
+
+
+	o sent along with this registration form as an Eurocheque
+
+	o sent along with this registration form.
+
+
+	==============================================================
+
+
+	The registered version of the program shall be
+
+	o sent uuencoded via Internet E-Mail to
+
+
+			____________________________
+
+
+	o sent via snail mail to:
+
+
+
+			____________________________
+
+
+			____________________________
+
+
+			____________________________
+
+
+			____________________________
+
+			a self-addressed envelope, a disk
+			and return postage are included.
+
+
+	==============================================================
+
+
+	Registration information:
+
+
+		NAME:		______________________________
+
+
+		INTERNET-EMAIL: ______________________________
+
+
+		COMPANY:	______________________________
+
+
+		ADDRESS:	______________________________
+
+
+				______________________________
+
+
+				______________________________
+
+
+				______________________________
+
+
+		SIGNATURE:	______________________________
+
+
+
+------------------------- END OF REGISTRATION FORM -------------------------

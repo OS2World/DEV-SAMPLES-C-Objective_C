@@ -1,0 +1,32 @@
+#define INCL_PM
+#define INCL_NLS
+
+#include <os2.h>
+#include "address.h"
+
+rcinclude address.dlg
+
+MENU IDD_MAIN
+{
+  SUBMENU      "~File",                      IDM_FILE
+  {
+    MENUITEM   "E~xit\tF3",                  IDM_EXIT
+  }
+  SUBMENU      "~Data",                      IDM_DATA
+  {
+    MENUITEM   "~New...\tF4",                IDM_NEWAD
+    MENUITEM   "~Edit..\tF5",                IDM_EDITAD
+    MENUITEM   "~Delete\tF6",                IDM_DELETEAD
+    MENUITEM                                 SEPARATOR
+    MENUITEM   "~Info...\tF7",               IDM_INFOAD
+  }
+}
+
+ACCELTABLE IDD_MAIN PRELOAD
+{
+    VK_F3,          IDM_EXIT,                VIRTUALKEY
+    VK_F4,          IDM_NEWAD,               VIRTUALKEY
+    VK_F5,          IDM_EDITAD,              VIRTUALKEY
+    VK_F6,          IDM_DELETEAD,            VIRTUALKEY
+    VK_F7,          IDM_INFOAD,              VIRTUALKEY
+}

@@ -1,0 +1,13 @@
+Installation log for book.zip
+Part of Objective C PM & DB Library
+Online Documentation, at the moment without FIGURES, TABLES, REFERENCES
+===============================================================================
+usr
+usr/install
+usr/install/book
+usr/lib
+usr/lib/book
+usr/lib/book/install.INF
+usr/lib/book/referenc.INF
+usr/lib/book/tools.INF
+usr/lib/book/tutorial.INF

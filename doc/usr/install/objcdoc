@@ -1,0 +1,16 @@
+Installation log for doc.zip
+Part of Objective C PM & DB Library
+Documentation for PM Library 0.7 and Database Library 0.5
+===============================================================================
+usr
+usr/doc
+usr/doc/install.ps.even
+usr/doc/install.ps.odd
+usr/doc/reference.ps.even
+usr/doc/reference.ps.odd
+usr/doc/tools.ps.even
+usr/doc/tools.ps.odd
+usr/doc/tutorial.ps.even
+usr/doc/tutorial.ps.odd
+usr/install
+usr/install/objcdoc

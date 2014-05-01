@@ -1,0 +1,10 @@
+Installation log for header.zip
+Part of Objective C PM & DB Library
+Patched include file os2.h, includes <os2emx.h>
+===============================================================================
+usr
+usr/include
+usr/include/objc
+usr/include/objc/os2.h
+usr/install
+usr/install/headers

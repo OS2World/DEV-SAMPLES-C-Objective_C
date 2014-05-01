@@ -1,0 +1,902 @@
+===============================================================================
+Changes in PM library from version 0.6 to 0.7
+===============================================================================
+
+This file provides necessary information for users of the PM class library.
+The main documentation was not changed since the last version was released.
+If you already printed the manual before, just read this information!
+
+The main difference between the last version of the class library and the
+current one is the addition of archiving methods (read:, write:, awake and
+createInPMWindow:) to the window classes. So whole dialog windows can be
+saved in Typed streams and reloaded afterwards. Theoretically, you could create
+Objects with a program on one machine and transfer them via typed streams to
+another machine on the local network...
+
+Additionally some new classes were introduced, simplifying the handling of
+Presentation Manager Help Windows and Printing.
+
+In this reference, the archiving methods are not described. You can assume
+"read:" to read an object from a typed stream, "write:" to archive the object
+to the specified stream and "awake" and "createInPMWindow:" to prepare the
+object after unarchiving. You should never call any of those methods in one
+of your programs. In addition to the size and position, the font and size
+selected for the window objects are saved. For container classes, also the
+data is stored on a stream, so don't forget to implement read:, write: and
+awake: methods for the data stored in your container, if you plan to archive
+container classes containing data.
+
+Methods not described here are used internally by the library and should never
+be modified or used by your own applications.
+
+
+1. New classes:
+===============
+
+The classes newly introduced with this version of the library are:
+
+	* DelegateWindow
+	* FactoryWindow
+	* Help
+	* InterfaceFile
+	* PresentationSpace and
+	* Printer
+
+
+1.1. DelegateWindow:
+--------------------
+	"DelegateWindow" is derived directly from "Window". It is the super-
+	class of "FactoryWindow", the class most other window classes are 
+	derived from.
+
+	From this version of the library on, most window classes can interact
+	with delegate objects. This class provides the basic functionality to
+	handle the connection of an object with it's delegate.
+
+
+ Instance Variables:
+
+ *	id delegate
+	This instance variable stores a pointer to the delegate object.
+
+
+ Methods:
+
+ *	init
+	"init" initializes the object and sets "delegate" to nil.
+
+ *	setDelegate: anObject
+	Using this method, you can set the window's delegate-object to
+	"anObject".
+
+ *	delegate
+	"delegate" returns a pointer to the current delegate object.
+
+
+1.2. FactoryWindow:
+-------------------
+	Most PM windows can send notification messages to their owner windows.
+	Using this class as a superclass of most other window classes enables
+	them to directly react to those notification messages. So you can now
+	easily and directly bind commands sent by buttons to some method in
+	another object. See the description of "Button" for more information.
+
+
+ Instance Variables:
+
+ *	HWND owner
+	The new owner window handle of all window objects.
+
+
+ Methods:
+
+ *	initIn: (Window *) aParent
+	Initializes the object and creates a new owner window.
+
+ *	associate: (HWND) hwnd
+	Used to bind an already existing PM window object to an Objective C
+	object. Either this method or one of the "init*" methods must be
+	used after allocating memory for the object using [... alloc] and
+	before using the object itself.
+
+ *	destroy
+	Destroy the owner window and it's associated children.
+
+
+1.3. Help:
+----------
+	This class is used to enable your applications to use the PM online
+	Help feature. Just create a help file using e.g. ipfc.exe and add an
+	instance of "Help" to your application.
+
+	Follow these steps to add help to your application:
+
+	1. add a help menu to your main window or help buttons to your dialog
+	   windows.
+
+	2. allocate a help object and inialize it.
+
+	3. associate the help object with your main window.
+
+	4. create command bindings for your menu items/buttons
+
+	Before closing your app, free the help object.
+
+	The object can display help for the standard topics:
+
+		"Help for Help" (How to use the online help feature)
+		"Extended Help" (show the first help page)
+		"Help index" (show the help index)
+
+	Additionally the object can display a specified help page.
+
+
+ Instance Variables:
+
+ *	BOOL helpEnabled
+	flag showing, if the help object was initialized correctly and the
+	online help feature can be used.
+
+ *	HWND helpInstance
+	window handle of the help window.
+
+
+ Methods:
+
+ *	initForApp: (StdApp *) anApp helpFile: (char *) fileName
+	calls "initForApp: anApp helpFile: fileName withTitle: "Help"
+	        helpTable: 1000".
+
+ *	initForApp: (StdApp *) anApp helpFile: (char *) fileName
+	 withTitle: (char *) helpTitle
+	calls "initForApp: anApp helpFile: fileName withTitle: helpTitle
+	        helpTable: 1000".
+
+ *	initForApp: (StdApp *) anApp helpFile: (char *) fileName
+	 withTitle: (char *) helpTitle helpTable: (ULONG) helpTableID
+	initializes the help object. "fileName" is the name of the help file.
+	"helpTitle" is the title of the help window, "helpTableID" is the
+	ID of the help table in the resource file.
+
+	"anApp" must be a pointer to an initialized instance of "StdApp".
+
+ *	free
+	frees the object and all resources allocated.
+
+ *	associateWith: aWindow
+	Before using a help object with your main window, you must associate
+	the help object with it. This is accomplished using this method.
+
+ *	helpForHelp: sender
+	Display information on how to use the help system. This method can
+	be bound directly to a menu item.
+
+ *	helpExtended: sender
+	Display the first help page according to the help table specified.
+	This method can be bound directly to a menu item.
+
+ *	helpIndex: sender
+	This method displays the help index, if available. It can be bound
+	directly to a menu item.
+
+ *	helpFor: sender
+	This method is used to display a special help topic. The topic is
+	specified by the sending object. The number of the topic (which is
+	the number also specified in the .ipf source file) is specified
+	by [sender tag]. Can be bound directly to a menu item or button.
+	If this method is bound to a button or a menu item via "bindCommand:
+	withObject: selector:", the sending object is the window, in which the
+	control resides. If bound to a button using the button's "bindWith:
+	selector:" method, the sending object is the button itself.
+
+ *	helpForTopic: (int) topic
+	Display help page specified by "topic".
+
+
+1.4. InterfaceFile:
+-------------------
+	As most of the classes in the library now provide support for
+	archiving, a class is provided to group many dialog objects (and also
+	command bindings etc.) into one object to simplify archiving and
+	unarchiving.
+
+	This class is used as the root class for archiving by all files created
+	by the "Interface Builder" program.
+
+	Instances of this class can store objects, command bindings, bindings
+	of instance variables of type "id" to other objects also stored and
+	objects not archived but created at run-time.
+
+	Only standard objects are supported now.
+
+	The objects are stored with a unique string key associated. The objects
+	can be queried either by index or by key. Querying by key is
+	recommended because the index can change after archiving/unarchiving.
+
+
+ Methods:
+
+ *	init
+	Initialize the object
+
+ *	free
+	free the memory allocated by this object
+
+ *	freeObjects
+	free this object and all objects stored
+
+ *	freeAll
+	free this object, all objects stored and all command/outlet bindings.
+
+ *	(char *) keyFor: (int) index
+	return the key for the object stored at index "index".
+
+ *	objectFor: (int) index
+	return the object stored at index "index".
+
+ *	(int) objectCount
+	return the number of objects already stored. Index range is from
+	0 to objectCount - 1.
+
+ *	addObject: anObject withKey: (char *) aKey
+	add the object "anObject" with the key "aKey" to the interface file.
+	"aKey" must be a unique, NULL-terminated string. On failure, nil
+	is returned, otherwise self.
+
+ *	objectForKey: (char *) aKey
+	returns the object stored with key "aKey". If none could found, nil
+	is returned.
+
+ *	deleteObjectWithKey: (char *) aKey
+	delete the object specified by "aKey" from the interface file.
+
+ *	(int) indexForKey: (char *) aKey
+	return the index of the object stored with "aKey"
+
+ *	(int) indexForObject: anObject
+	return the index of the object pointed to by "anObject"
+
+
+1.5. PresentationSpace:
+-----------------------
+	PM uses presentation spaces whenever drawing shall take place. This
+	class provides an encapsulation of *some few* access methods to
+	presentation spaces, mainly those for drawing text and selecting
+	fonts. More methods for drawing etc. will follow.
+
+	You should not use an instance of this object directly. Only instances
+	of "Printer", a subclass of "PresentationSpace" were tested.
+
+
+ Methods:
+
+ *	(LONG) witdhInPels
+	return the width of the presentation space (or the printer form)
+	in pixels.
+
+ *	(LONG) witdhInMm
+	return the width of the presentation space (or the printer form)
+	in mm.
+
+ *	(LONG) heightInPels
+	return the height of the presentation space (or the printer form)
+	in pixels.
+
+ *	(LONG) heightInMm
+	return the height of the presentation space (or the printer form)
+	in mm.
+
+ *	(LONG) xResolution
+	returns the horizontal *font* resolution in dpi.
+
+ *	(LONG) yResolution
+	returns the vertical *font* resoultion in dpi.
+
+ *	(LONG) textHeight
+	returns the height of the currently selected font in pixels.
+
+ *	setSpacing: (float) ratio
+	When printing text boxes, the lines are separated by (ratio - 1) *
+	"textHeight" pixels. For normal text you should use a spacing ratio
+	of 1.2.
+
+ *	(float) spacing
+	returns the current spacing ratio for text boxes.
+
+ *	setFont: (char *) fontName
+	This method selects a font by name. The point size currently selected
+	is not changed.
+
+	Example:     [printer setFont: "Helvetica"]; // select Helvetica font
+
+ *	setFont: (char *) fontName at: (LONG) pointSize
+	set the font to "fontName" and the size to "pointSize".
+
+	Example:     [printer setFont: "Courier" at: 12]; // select Courier at
+							  // 12 pt.
+
+ *	setFontSize: (LONG) pointSize
+	set the size of the current font in printer points.
+
+ *	(LONG) stringWidth: (char *) aString
+	returns the width of the "aString" in pixels.
+
+ *	(LONG) stringBoxWidth: (char *) stringBox
+	A string box is a string including newline characters. The lines are
+	drawn left-aligned separated by the spacing ratio.
+
+	This method returns the width of a string box. The width of a string
+	box is the width of the longest line in the box.
+
+ *	(LONG) stringBoxHeight: (char *) stringBox
+	Returns the height of the string box in pixels.
+
+ *	string: (char *) aString
+	Draw "aString" at the current position with the current font and
+	pointsize.
+
+ *	string: (char *) aString at: (LONG) x : (LONG) y
+	Draw "aString" at position (x/y) with the current font and size.
+	"x" and "y" are measured in pixels.
+
+ *	stringBox: (char *) stringBox
+	Draw the string box at the current position with the current font and
+	pointsize. The line spacing ratio can be set using "setSpacing:".
+
+ *	stringBox: (char *) stringBox at: (LONG) x : (LONG) y
+	Draw the string box at (x/y) with the current font and pointsize.
+
+ *	lineTo: (LONG) x : (LONG) y
+	Draw a line from the current position to (x/y). "x" and "y" are
+	measured in pixels.
+
+ *	lineFrom: (LONG) x0 : (LONG) y0 to: (LONG) x : (LONG) y
+	Draw a line from (x0/y0) to (x/y).
+
+
+1.6. Printer:
+-------------
+	To simplify printing from your applications, this class is provided.
+	The "Printer" class can be used to initialize the printer object and
+	select the current printer/printer job properties.
+
+	To control spooling, use the methods "beginSpool: appTitle:",
+	"endSpool" and "newPage".
+
+
+ Methods:
+
+ *	initForApp: (StdApp *) anApp
+	initializes the printer object. "anApp" must be a pointer to your
+	application object.
+
+ *	free
+	free all memory associated with this object and perform a clean-up.
+
+ *	beginSpool: (char *) spoolTitle appTitle: (char *) appTitle
+	Start a print job on the currently selected printer. This must
+	be ended using "endSpool". Terminating a print job is not supported
+	at the moment.
+
+	While spooling, you *must not* call either "beginSpool: appTitle:",
+	"printerSetup:", "setDefault" or "jobProperties:".
+
+	"spoolTitle" is shown in the settings notebook of a print job,
+	"appTitle" is shown in the icon view of any printer object.
+
+ *	endSpool
+	end the current print job and eject the page.
+
+ *	newPage
+	eject the current page and start a new one.
+
+ *	printerSetup: sender
+	This method displays the setup dialog specified by "setSetupDialog:".
+	This method can be bound directly to a menu item.
+
+ *	setSetupDialog: aSetupDialog
+	The setup dialog *must* contain a listbox with PM id 1000 and a
+	job properties push button with id 1001. The list is automatically
+	initialized when calling "printerSetup:"
+
+ *	setupDialog
+	returns a pointer to the current setup dialog.
+
+ *	jobProperties: sender
+	display the job properties dialog. This method should not be called
+	directly by your application.
+
+
+2. Changes to old classes:
+==========================
+
+This section describes the changes made to already existing classes in the
+library. The addition of archiving methods is not stated explicitly for every
+class. All window classes are now derived from "DelegateWindow", supporting
+"setDelegate:" and "delegate" methods now.
+
+2.1. Button:
+------------
+	"Button" is now a subclass of "FactoryWindow".
+
+	New methods to directly bind a command to a button (also a checkbox,
+	a radiobutton, etc.) were introduced. These are:
+
+ *	setTarget: aTarget
+	Set the target object for a command. This *must* be specified after
+	setting the action.
+
+ *	setAction: (SEL) anAction
+	Set the method to be called when the button is clicked.
+
+ *	bindWith: anObject selector: (SEL) aSel
+	Bind the button with "anObject" and selector "aSel".
+
+	Example:	[button bindWith: help selector: @selector(helpFor:)];
+
+	is equivalent to:
+
+			[button setAction: @selector(helpFor:)];
+			[button setTarget: help];
+
+	If possible, you should use the methods of Button to bind the commands,
+	instead of the bindCommand: with: selector: method of the dialog or
+	main window, the button is in. Those should only be used to bind
+	menu items to methods!
+
+
+2.2. Container:
+---------------
+	Container now supports notifying the delegate when some special user
+	interactions occured. Note, that the following methods are not methods
+	implemented by the "Container" class, but can be implemented by a
+	delegate object.
+
+ *	stringChanged: (CNREDITDATA *) editData
+	This method is called, whenever the user changes a string value in
+	the container by direct editing.
+
+ *	changeString: (CNREDITDATA *) editData
+	If the user edits a string, normally a new memory block must be
+	allocated to store it. When this delegate method returns a non-nil
+	value, the new string is copied into the buffer specified in
+	"editData". If nil is returned, the string is not copied.
+
+ *	enterPressed: (NOTIFYRECORDENTER *) recordEnter
+	When the user double-clicks in the container or presses Enter, the
+	container sends this message to the delegate. So the delegate can
+	respond to this action by performing some application-specific
+	functionality.
+
+ *	showContextMenu: (PRECORDCORE) recordCore
+	When the user tries to bring up the contextmenu, in the container
+	object, the delegate object is notified. If the mouse pointer is over
+	a container item, recordCore is a pointer to the RECORDCORE structure
+	of this item.
+
+	Normally, the delegate method should use WinPopupMenu to display a
+	context menu.
+
+
+2.3. EntryField:
+----------------
+	New methods to set or query the contents of the entry field were
+	added, conforming to the "Value" protocol
+
+ *	(char *) stringValue
+	retrieve the contents of the entry field as a string. The string must
+	be freed afterwards using free ().
+
+ *	(int) intValue
+	retrieve the contents of the entry field as an integer.
+
+ *	(long) longValue
+	retrieve the contents of the entry field as a long integer.
+
+ *	(float) floatValue
+	retrieve the contents of the entry field as a floating point value.
+
+ *	setStringValue: (char *) aValue
+	set the contents of the entry field as a string.
+
+ *	setIntValue: (int) aValue
+	set the contents of the entry field as an integer.
+
+ *	setLongValue: (long) aValue
+	set the contents of the entry field as a long integer.
+
+ *	setFloatValue: (float) aValue
+	set the contents of the entry field as a floating point value.
+
+
+2.4. FileDlg:
+-------------
+ *	runModalFor: sender
+	This method returns self if the dialog could be run modal and nil
+	otherwise. The result of the dialog processing can be retrieved via
+	"result".
+
+ *	(ULONG) result
+	returns the result of the last dialog execution.
+
+
+2.5. Notebook:
+--------------
+	Notebook is now derived from "FactoryWindow". Basic support for
+	creating and deleting pages is provided.
+
+ *	(ULONG) createTopPageWithStatusText: (BOOL) stFlag
+	Calling this method creates a new FIRST page (top page) for the
+	notebook window.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMajorTopPageWithStatusText: (BOOL) stFlag
+	Calling this method creates a new FIRST page (top page) for the
+	notebook window. The page has a MAJOR tab attribute.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMinorTopPageWithStatusText: (BOOL) stFlag
+	Calling this method creates a new FIRST page (top page) for the
+	notebook window. The page has a MINOR tab attribute.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createLastPageWithStatusText: (BOOL) stFlag
+	Calling this method creates a new LAST page for the notebook window.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMajorLastPageWithStatusText: (BOOL) stFlag
+	Calling this method creates a new LAST page for the notebook window.
+	The page has a MAJOR tab attribute.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMinorLastPageWithStatusText: (BOOL) stFlag
+	Calling this method creates a new LAST page for the notebook window.
+	The page has a MINOR tab attribute.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createPageBefore: (ULONG) pageID withStatusText: (BOOL) stFlag
+	Calling this method creates a new page for the notebook window. The
+	page is inserted BEFORE the page specified by "pageID".
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMajorPageBefore: (ULONG) pageID 
+                       withStatusText: (BOOL) stFlag
+	Calling this method creates a new page for the notebook window. The
+	page is inserted BEFORE the page specified by "pageID". MAJOR tab.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMinorPageBefore: (ULONG) pageID 
+                       withStatusText: (BOOL) stFlag
+	Calling this method creates a new page for the notebook window. The
+	page is inserted BEFORE the page specified by "pageID". MINOR tab.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createPageAfter: (ULONG) pageID
+                withStatusText: (BOOL) statusFlag
+	Calling this method creates a new page for the notebook window. The
+	page is inserted AFTER the page specified by "pageID".
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMajorPageAfter: (ULONG) pageID 
+                      withStatusText: (BOOL) stFlag
+	Calling this method creates a new page for the notebook window. The
+	page is inserted AFTER the page specified by "pageID". MAJOR tab.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	(ULONG) createMinorPageAfter: (ULONG) pageID 
+                      withStatusText: (BOOL) stFlag
+	Calling this method creates a new page for the notebook window. The
+	page is inserted AFTER the page specified by "pageID". MINOR tab.
+
+	If "stFlag" is YES, an area for status text is reserved. The status
+	text can be set using [notebook setStatusLineTextFor: to:].
+
+	This method returns a handle (ULONG) to the page created. It must be
+	used when setting the status text, inserting a page before or after
+	a special one, or deleting a page.
+
+ *	deletePage: (ULONG) pageID
+	This method deletes the page specified by "pageID".
+
+ *	deleteAllPages
+	This method deletes all pages currently in the notebook.
+
+ *	setStatusLineTextFor: (ULONG) pageID to: (char *) aString
+	Set the status line text for notebook page "pageID" to "aString".
+
+ *	setTabTextFor: (ULONG) pageID to: (char *) aString
+	Set the tab text for page "pageID" to "aString".
+
+ *	setMajorTabDimensions: (USHORT) width : (USHORT) height
+	Set the major tab dimensions to ("width"/"height") Pels.
+
+ *	setMinorTabDimensions: (USHORT) width : (USHORT) height
+	Set the minor tab dimensions to ("width"/"height") Pels.
+
+ *	setPageButtonDimensions: (USHORT) width : (USHORT) height
+	Set the page button dimensions to ("width"/"height") Pels.
+
+ *	setPage: (ULONG) pageID to: (Window *) aWindow
+	Display "aWindow" on page "pageID", when this page is shown. The
+	window object is NOT freed automatically, when the page is deleted.
+
+
+2.6. StdApp:
+------------
+
+ *	loadIBFile: (char *) fileName
+	This method loads an interface file from disk. The name of the file
+	is specified via "fileName". The file is searched for first in the
+	current working directory, if it could not be found there, the
+	directory the executable file was started from, is checked.
+
+	While loading, all objects stored in the interface file are allocated
+	and initialized.
+
+	A pointer to the InterfaceFile object is returned. This object is
+	NOT freed automatically, when freeing the application object.
+
+	You can load more than one interface file for a single application.
+	It is recommended, to put related objects into a single file. The
+	files should be loaded on demand, when the objects stored there are
+	needed.
+
+	The objects stored in the interface file can be accessed using the
+	appropriate methods of InterfaceFile.
+
+
+2.7. StdDialog:
+---------------
+
+ *	initWithId: (ULONG) anId andFlags: (ULONG) flags
+	While initWithId: is used to load dialog windows from a resource file,
+	this method creates an empty dialog window from scratch. "flags"
+	can be used to control the look and feel of the newly created dialog
+	window, just like the border type (FCF_DLGBORDER,FCF_SIZEBORDER,...).
+
+ *	(ULONG) createFlags
+	This method returns the flags specified at creation time with
+	initWithId: andFlags: or those set via setCreateFlags:
+
+ *	setCreateFlags: (ULONG) flags
+	Set the frame creation flags for the dialog window. The modifications
+	are not displayed immediately!
+
+ *	updateFrame
+	Send a WM_UPDATEFRAME message to the dialog window.
+
+ *	setTitle: (char *) aTitle
+	Set the title of the dialog window. This is equivalent to setText:
+
+ *	(BOOL) running
+	This method returns YES, if the dialog window is executed using
+	runModalFor:.
+
+ *	centerOnScreen: sender
+	Centers the dialog window on the screen. This method can be bound
+	directly to a button or menu item!
+
+
+2.8. StdWindow:
+---------------
+ *	(ULONG) windowStyle
+	returns the window style specified at creation time.
+
+ *	setWindowStyle: (ULONG) styleFlags
+	modify the window style. These changes are normally not displayed
+	immediately.
+
+ *	(ULONG) pmId
+	returns the PM identifier of the window.
+
+ *	setPmId: (ULONG) anId
+	sets the PM identifier of the window
+
+ *	performClose: sender
+	This causes the window to be closed.
+
+ *	performQuit: sender
+	The window is closed and the application is terminated.
+
+ *	centerOnScreen: sender
+	Centers the dialog window on the screen. This method can be bound
+	directly to a button or menu item!
+
+
+2.9. Window:
+------------
+ *	(ULONG) windowStyle
+	returns the window style of the window.
+
+ *	setWindowStyle: (ULONG) styleFlags
+	set the window style of the window. Depending on the particular window,
+	calling invalidate may cause the changes to be displayed immediately.
+
+ *	enable
+	enables the window, it can be selected and all window-specific actions,
+	like entering text can be performed.
+
+ *	disable
+	disables the window. No window-specific actions can be performed.
+
+ *	invalidate
+	invalidates the window area. This causes changes to be redisplayed,
+	if any were made (e.g. with setWindowStyle:)
+
+ *	show
+	displays the window on the screen
+
+ *	hide
+	hides the window.
+
+
+3. Using the Interface Builder:
+===============================
+
+Starting with this version of the library, some sort of dialog editor is
+included, to let you easily create dialog windows for your application. At
+the moment, this is just a simple program, letting you create dialog windows
+and insert, move and change the appearance of some of the most-used window
+classes. Support for all OS/2 supported window classes will be added soon.
+
+In addition to simple creation and editing of dialog windows, most of the
+dynamic binding now accomplished using the bindCommand: with: selector:,
+bindWith: selector: and setDelegate: methods will be supported in future
+releases by simple drag & drop.
+
+The Interface Builder program does not create OS/2 resource files. All objects
+in an interface file are standard Objective C objects. These are created as
+soon as you load a file.
+
+Just try it. There's no more documentation at the moment.
+
+Some hints:	Reordering of the items in a dialog window is not possible
+		now!
+
+		All changes to objects created can be made using the
+		Preferences dialog. This dialog is not modal! It can be
+		open all time you edit an interface file. As soon a new object
+		is selected, the preferences are updated!
+
+		When deleting a dialog window, or closing an interface file,
+		the preferences dialog is not updated automatically. Just
+		select another dialog window to refresh the display.
+
+		Using the interface files is really simple! Load the files
+		using the appropriate method of StdApp (see above) and access
+		the objects stored with their keys.
+
+		Selection of a window is performed using the first mouse
+		button. The selected object can be resized - at the moment
+		only diagonally.
+
+		Moving an object is performed by clicking and holding the
+		second mouse button on any object and dragging!
+
+		You can change the font and size of the objects by dragging
+		a font template from the font palette and dropping it on the
+		item (e.g. a button). This font and size change is saved!
+
+If you are using interface files in one of your programs, call the function
+registerClasses() somewhere in your main file. This function really does
+nothing. But, if you are using Objective C objects unarchived from a stream,
+which are referenced by class nowhere else in your program, the code for these
+classes will not be linked to your app. Calling this function prevents the
+linker to be too optimizing! You can expect your application to produce
+core dumps as soon as you try to load an interface file if you forget to call
+this function!
+
+Example:
+========
+
+	main ()
+	{
+		.
+		.
+		.
+
+		registerClasses ();
+
+		.
+		.
+		.
+	}
+
+
+Using a resolution of at least 1024x768 is recommended for the interface
+builder!
+
+More features, bug-fixes and much better documentation following soon.
+
+
+The shareware version of the Interface Builder is limited to only two open
+files at once and only two dialog windows per interface file.
+
+
+4. Additions to the printed manuals
+===================================
+To use rc correctly, don't forget to set the environment variable
+INCLUDE to a directory, where the file os2.h can be found.
+
+e.g.
+
+SET INCLUDE=c:\emx\include
+
+
+If you have any questions, feel free to contact me. E-Mail is preferred.
+If sending any questions via E-Mail in July 1995, be patient, I won't have
+access to my Mailbox until the first week of August.
+
+===============================================================================
+Thomas Baier
+Ufergasse 68
+A-3500 Krems
+Austria
+
+<baier@ci.tuwien.ac.at>

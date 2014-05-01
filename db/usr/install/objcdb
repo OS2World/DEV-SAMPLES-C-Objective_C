@@ -1,0 +1,27 @@
+Installation log for db.zip
+Part of Objective C PM & DB Library
+Database Library Version 0.5
+===============================================================================
+usr
+usr/bin
+usr/bin/PM
+usr/bin/PM/DBBuild.exe
+usr/include
+usr/include/db
+usr/include/db/db.h
+usr/include/db/dbboolfield.h
+usr/include/db/dbcharfield.h
+usr/include/db/dbdatefield.h
+usr/include/db/dbfield.h
+usr/include/db/dbfile.h
+usr/include/db/dblist.h
+usr/include/db/dbmemofield.h
+usr/include/db/dbnumfield.h
+usr/include/db/dbrecord.h
+usr/include/db/dbsearcharg.h
+usr/include/db/dbtypes.h
+usr/install
+usr/install/objcdb
+usr/lib
+usr/lib/objcdb.a
+usr/lib/objcdb.lib

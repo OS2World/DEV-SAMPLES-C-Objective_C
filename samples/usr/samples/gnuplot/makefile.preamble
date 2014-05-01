@@ -1,0 +1,26 @@
+CC = gcc
+CPP = $(CC) -E
+AR = ar
+MAKE = gmake
+TOUCH = touch
+STRIP = emxbind -s
+
+RC = rc -r
+
+OBJ = .o
+EXE = .exe
+LIB = .a
+
+CFLAGS = -O2
+LDFLAGS = -L. -lobjc -los2
+
+.SUFFIXES: .h .m .c .rc .res $(OBJ) $(EXE)
+
+.c.o:
+	$(CC) -c $(CFLAGS) $<
+
+.m.o:
+	$(CC) -c $(CFLAGS) $<
+
+.rc.res:
+	$(RC) $<

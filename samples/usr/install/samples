@@ -1,0 +1,37 @@
+Installation log for db.zip
+Part of Objective C PM & DB Library
+Sample programs
+===============================================================================
+usr
+usr/install
+usr/install/samples
+usr/samples
+usr/samples/address
+usr/samples/address/address.dbf
+usr/samples/address/address.dlg
+usr/samples/address/address.h
+usr/samples/address/address.rc
+usr/samples/address/addresses.m
+usr/samples/address/controller.h
+usr/samples/address/controller.m
+usr/samples/address/EMPTY.DBF
+usr/samples/address/makefile
+usr/samples/address/makefile.preamble
+usr/samples/gnuplot
+usr/samples/gnuplot/controller.h
+usr/samples/gnuplot/controller.m
+usr/samples/gnuplot/gnuplot.dlg
+usr/samples/gnuplot/gnuplot.h
+usr/samples/gnuplot/gnuplot.rc
+usr/samples/gnuplot/makefile
+usr/samples/gnuplot/makefile.preamble
+usr/samples/gnuplot/plot.m
+usr/samples/ib
+usr/samples/ib/ifsample.m
+usr/samples/ib/ifsample.oib
+usr/samples/ib/makefile
+usr/samples/textview
+usr/samples/textview/textview.m
+usr/samples/textview/textview2.m
+usr/samples/textview/textview3.m
+usr/samples/textview/textview3.rc
